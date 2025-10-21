@@ -43,7 +43,7 @@ func SyncDataset() error {
 	log := logger.Scoped("animetosho/dataset")
 	flog := logger.Scoped("animetosho/dataset/files")
 
-	filesDB, err := sql.Open("sqlite3", "file:animetosho-files.db?mode=memory")
+	filesDB, err := sql.Open("sqlite", "file:animetosho-files.db?mode=memory")
 	if err != nil {
 		return err
 	}

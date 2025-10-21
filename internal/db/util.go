@@ -67,7 +67,7 @@ func ParseConnectionURI(connection_uri string) (ConnectionURI, error) {
 	switch u.Scheme {
 	case "sqlite":
 		uri.Dialect = DBDialectSQLite
-		uri.DriverName = "sqlite3"
+		uri.DriverName = "sqlite"
 		if u.Host != "" && u.Host != "." {
 			return uri, errors.New("invalid path, must start with '/' or './'")
 		}

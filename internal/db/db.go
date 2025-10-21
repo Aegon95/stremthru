@@ -8,7 +8,7 @@ import (
 
 	"github.com/MunifTanjim/stremthru/internal/config"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 type DB struct {
@@ -81,13 +81,9 @@ var getExec = func(db Executor) dbExec {
 		retryLeft := 2
 		r, err := db.Exec(query, args...)
 		for err != nil && retryLeft > 0 {
-			if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrBusy {
-				time.Sleep(2 * time.Second)
-				r, err = db.Exec(query, args...)
-				retryLeft--
-			} else {
-				retryLeft = 0
-			}
+			time.Sleep(2 * time.Second)
+			r, err = db.Exec(query, args...)
+			retryLeft--
 		}
 		return r, err
 	}
