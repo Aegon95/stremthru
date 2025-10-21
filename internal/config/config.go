@@ -57,7 +57,7 @@ var defaultValueByEnv = map[string]map[string]string{
 	"": {
 		"STREMTHRU_BASE_URL":                               "http://localhost:8080",
 		"STREMTHRU_CONTENT_PROXY_CONNECTION_LIMIT":         "*:0",
-		"STREMTHRU_DATABASE_URI":                           "sqlite://./data/stremthru.db",
+		"STREMTHRU_DATABASE_URI":                           "postgresql://neondb_owner:npg_QRvj6efF0wug@ep-orange-pine-agi85pwq-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
 		"STREMTHRU_DATA_DIR":                               "./data",
 		"STREMTHRU_LANDING_PAGE":                           "{}",
 		"STREMTHRU_LOG_FORMAT":                             "json",

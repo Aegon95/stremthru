@@ -3,12 +3,10 @@ package db
 import (
 	"database/sql"
 	"log"
-	"net/url"
 	"time"
 
 	"github.com/MunifTanjim/stremthru/internal/config"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	_ "modernc.org/sqlite"
 )
 
 type DB struct {
@@ -36,17 +34,6 @@ var connUri, dsnModifiers = func() (ConnectionURI, []DSNModifier) {
 	dsnModifiers := []DSNModifier{}
 
 	switch Dialect {
-	case DBDialectSQLite:
-		BooleanFalse = "0"
-		BooleanTrue = "1"
-		CurrentTimestamp = "unixepoch()"
-		FnJSONGroupArray = "json_group_array"
-		FnJSONObject = "json_object"
-		NewAdvisoryLock = sqliteNewAdvisoryLock
-
-		dsnModifiers = append(dsnModifiers, func(u *url.URL, q *url.Values) {
-			u.Scheme = "file"
-		})
 	case DBDialectPostgres:
 		BooleanFalse = "false"
 		BooleanTrue = "true"

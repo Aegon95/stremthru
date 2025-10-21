@@ -1,23 +1,8 @@
 package anilist
 
 import (
-	"context"
-	"net/http"
-	"slices"
 	"time"
-
-	"github.com/MunifTanjim/stremthru/internal/config"
-	"github.com/hasura/go-graphql-client"
 )
-
-var client = graphql.NewClient(
-	"https://graphql.anilist.co/graphql",
-	config.GetHTTPClient(config.TUNNEL_TYPE_AUTO),
-	graphql.WithRetry(3),
-	graphql.WithRetryBaseDelay(2*time.Second),
-	graphql.WithRetryExponentialRate(2),
-	graphql.WithRetryHTTPStatus([]int{http.StatusTooManyRequests}),
-).WithDebug(config.Environment == config.EnvDev)
 
 type MediaSeason string
 
@@ -71,32 +56,6 @@ type getUserAnimeListQuery struct {
 }
 
 func FetchUserList(userName, name string) (*List, error) {
-	var q getUserAnimeListQuery
-	err := client.Query(context.Background(), &q, map[string]any{
-		"userName": userName,
-	})
-	if err != nil {
-		return nil, err
-	}
-	for i := range q.MediaListCollection.Lists {
-		l := &q.MediaListCollection.Lists[i]
-		if l.Name != name {
-			continue
-		}
-		list := List{
-			UserName:       userName,
-			Name:           l.Name,
-			IsCustom:       l.IsCustomList,
-			MediaIds:       make([]int, len(l.Entries)),
-			ScoreByMediaId: make(map[int]int, len(l.Entries)),
-		}
-		for i := range l.Entries {
-			mediaId := l.Entries[i].MediaList.Media.Id
-			list.MediaIds[i] = mediaId
-			list.ScoreByMediaId[mediaId] = l.Entries[i].Score
-		}
-		return &list, nil
-	}
 	return nil, nil
 }
 
@@ -202,36 +161,7 @@ func IsValidSearchList(name string) bool {
 }
 
 func FetchSearchList(name string) (*List, error) {
-	meta, ok := searchListQueryInputByName[name]
-	if !ok {
-		return nil, nil
-	}
-	totalItems := searchAnimeListMaxPage * searchAnimeListPerPage
-	list := List{
-		UserName:       "~",
-		Name:           name,
-		MediaIds:       make([]int, 0, totalItems),
-		ScoreByMediaId: make(map[int]int, totalItems),
-	}
-	for pageIdx := range searchAnimeListMaxPage {
-		page := pageIdx + 1
-		log.Debug("fetching search list page", "name", name, "page", page)
-		var data SearchAnimeListData
-		err := client.Exec(context.Background(), searchAnimeListQuery, &data, meta.getInput(page))
-		if err != nil {
-			return nil, err
-		}
-		medias := data.Page.Media
-		for mIdx := range medias {
-			mediaId := medias[mIdx].Id
-			list.MediaIds = append(list.MediaIds, mediaId)
-			list.ScoreByMediaId[mediaId] = totalItems - (page-1)*searchAnimeListPerPage - mIdx
-		}
-		if len(medias) < searchAnimeListPerPage {
-			break
-		}
-	}
-	return &list, nil
+	return nil, nil
 }
 
 type fetchMediasQuery struct {
@@ -279,36 +209,6 @@ func FetchMedias(mediaIds []int) ([]Media, error) {
 	}
 
 	medias := []Media{}
-	for cIds := range slices.Chunk(mediaIds, 50) {
-		var q fetchMediasQuery
-		err := client.Query(context.Background(), &q, map[string]any{
-			"page": 1,
-			"ids":  cIds,
-		})
-		if err != nil {
-			return nil, err
-		}
-		for i := range q.Page.Media {
-			m := &q.Page.Media[i]
-			media := Media{
-				Id:          m.Id,
-				IdMal:       m.IdMal,
-				Format:      MediaFormat(m.Format),
-				Title:       m.Title.English,
-				Description: m.Description,
-				BannerImage: m.BannerImage,
-				CoverImage:  m.CoverImage.ExtraLarge,
-				Duration:    m.Duration,
-				IsAdult:     m.IsAdult,
-				Genres:      m.Genres,
-				StartYear:   m.StartDate.Year,
-			}
-			if media.Title == "" {
-				media.Title = m.Title.Romaji
-			}
-			medias = append(medias, media)
-		}
-	}
 	return medias, nil
 }
 
@@ -362,25 +262,5 @@ func FetchAnimeMediaFormatInfo(mediaIds []int) ([]MediaFormatInfo, error) {
 	}
 
 	infos := []MediaFormatInfo{}
-	for cIds := range slices.Chunk(mediaIds, 50) {
-		var q fetchAnimeMediaFormatInfoQuery
-		err := client.Query(context.Background(), &q, map[string]any{
-			"page": 1,
-			"ids":  cIds,
-		})
-		if err != nil {
-			return nil, err
-		}
-		for i := range q.Page.Media {
-			m := &q.Page.Media[i]
-			info := MediaFormatInfo{
-				Id:     m.Id,
-				IdMal:  m.IdMal,
-				Format: MediaFormat(m.Format),
-			}
-			infos = append(infos, info)
-		}
-		time.Sleep(2 * time.Second)
-	}
 	return infos, nil
 }
