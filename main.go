@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/MunifTanjim/stremthru/internal/config"
@@ -10,6 +9,7 @@ import (
 	"github.com/MunifTanjim/stremthru/internal/shared"
 	"github.com/MunifTanjim/stremthru/internal/worker"
 	"github.com/MunifTanjim/stremthru/store"
+	"github.com/syumai/workers"
 )
 
 func main() {
@@ -49,18 +49,5 @@ func main() {
 
 	handler := shared.RootServerContext(mux)
 
-	addr := ":" + config.Port
-	if config.Environment == config.EnvDev {
-		addr = "localhost" + addr
-	}
-	server := &http.Server{Addr: addr, Handler: handler}
-
-	if len(config.ProxyAuthPassword) == 0 {
-		server.SetKeepAlivesEnabled(false)
-	}
-
-	log.Println("stremthru listening on " + addr)
-	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("failed to start stremthru: %v", err)
-	}
+	workers.Serve(handler)
 }

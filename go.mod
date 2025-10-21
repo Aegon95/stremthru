@@ -8,6 +8,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/hasura/go-graphql-client v0.14.3
 	github.com/redis/go-redis/v9 v9.0.0-rc.4
+	github.com/syumai/workers v0.30.2
 	github.com/zeebo/xxh3 v1.0.2
 	golang.org/x/sync v0.13.0
 	golang.org/x/text v0.24.0
