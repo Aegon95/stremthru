@@ -9,6 +9,7 @@ require (
 	github.com/hasura/go-graphql-client v0.14.3
 	github.com/redis/go-redis/v9 v9.0.0-rc.4
 	github.com/syumai/workers v0.30.2
+	github.com/ulikunitz/xz v0.5.15
 	github.com/zeebo/xxh3 v1.0.2
 	golang.org/x/sync v0.13.0
 	golang.org/x/text v0.24.0
@@ -45,7 +46,6 @@ require (
 	github.com/go-redis/cache/v9 v9.0.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.2
-	github.com/jamespfennell/xz v0.1.2
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/lmittmann/tint v1.0.7
 	github.com/madflojo/tasks v1.2.1

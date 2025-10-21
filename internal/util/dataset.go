@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jamespfennell/xz"
+	"github.com/ulikunitz/xz"
 )
 
 type aError struct {
@@ -296,8 +296,11 @@ func (ds *Dataset) download() error {
 		}
 		defer f.Close()
 
-		xzr := xz.NewReader(f)
-		defer xzr.Close()
+		xzr, err := xz.NewReader(f)
+
+		if err != nil {
+			return err
+		}
 
 		out, err := os.Create(filePath)
 		if err != nil {
